@@ -1,4 +1,8 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, redirect, request
+from flask.helpers import flash, url_for, get_flashed_messages
+from flask.wrappers import Request
+from models.user import User
+from werkzeug.security import check_password_hash, generate_password_hash
 
 
 users_blueprint = Blueprint('users',
@@ -10,11 +14,18 @@ users_blueprint = Blueprint('users',
 def new():
     return render_template('users/new.html')
 
-
 @users_blueprint.route('/', methods=['POST'])
 def create():
-    pass
+    username = request.form.get('user_name')
+    email = request.form.get('user_email')
+    password = request.form.get('user_password')
+    hashed_password = generate_password_hash(password)
+    user = User(name=username, email=email, password=hashed_password)
 
+    if user.save():
+        return redirect(url_for('users.new'))
+    else:
+        return render_template('users/new.html', errors=user.errors)
 
 @users_blueprint.route('/<username>', methods=["GET"])
 def show(username):
