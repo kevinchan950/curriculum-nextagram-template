@@ -19,3 +19,8 @@ footer a {
   text-decoration: none;
   color: #303030;
 }
+
+
+.body_content {
+  padding: 20px;
+}

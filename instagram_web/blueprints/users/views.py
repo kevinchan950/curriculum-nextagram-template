@@ -1,9 +1,9 @@
-from flask import Blueprint, render_template, redirect, request
+from flask import Blueprint, render_template, redirect, request, session
 from flask.helpers import flash, url_for
 from flask.wrappers import Request
 from models.user import User
-from werkzeug.security import generate_password_hash
-
+from werkzeug.security import check_password_hash, generate_password_hash
+from flask_login import login_user
 
 users_blueprint = Blueprint('users',
                             __name__,
@@ -20,17 +20,19 @@ def create():
     email = request.form.get('user_email')
     password = request.form.get('user_password')
     hashed_password = generate_password_hash(password)
-    user = User(name=username, email=email, password=hashed_password)
+    user = User(name=username, email=email, password_hash=hashed_password, password=password)
 
     if user.save():
         flash("Successfully sign up")
-        return redirect(url_for('users.new'))
+        login_user(user)
+        return redirect(url_for('users.show', username=username))
     else:
         return render_template('users/new.html', errors=user.errors)
 
+
 @users_blueprint.route('/<username>', methods=["GET"])
 def show(username):
-    pass
+    return render_template("users/profile.html")
 
 
 @users_blueprint.route('/', methods=["GET"])

@@ -3,19 +3,32 @@ import os
 import config
 from flask import Flask
 from models.base_model import db
+from models.user import User
+from flask_login import LoginManager
 
 web_dir = os.path.join(os.path.dirname(
     os.path.abspath(__file__)), 'instagram_web')
 
 app = Flask('NEXTAGRAM', root_path=web_dir)
 
-app.secret_key = b"~4AO\xceX\xbd\xd3\xd5C\xa6\xc2\xcb\xe16a\xa4'\xde\xd5\xec\xe1\x05\xc4=\xec;zX;}-"
+app.secret_key = os.getenv('SECRET_KEY')
 csrf = CSRFProtect(app)
+
 
 if os.getenv('FLASK_ENV') == 'production':
     app.config.from_object("config.ProductionConfig")
 else:
     app.config.from_object("config.DevelopmentConfig")
+
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+# login_manager.login_view = "users.login"
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get_or_none(User.id == user_id)
 
 
 @app.before_request

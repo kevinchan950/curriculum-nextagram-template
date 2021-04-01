@@ -1,4 +1,9 @@
 {% extends "_layout.html" %}
+
+{% block title %}
+    Signup
+{% endblock %}
+
 {% block content %}
     <h1>User Sign Up Form</h1>
     {% for error in errors if errors %}
@@ -19,7 +24,7 @@
 
         <div class="form-group">
             <label for="user_password">Password:</label>
-            <input type="text" class="form-control" name="user_password" />
+            <input type="password" class="form-control" name="user_password" />
         </div>
 
         <button type="submit" class="btn btn-primary">Submit</button>
