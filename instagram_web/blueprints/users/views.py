@@ -98,22 +98,29 @@ def upload_image(username):
 
 @users_blueprint.route('/<username>/upload/image', methods=["POST"])
 def create_image(username):
-    file = request.files.get('upload_image')
-    bucket_name = os.getenv('S3_BUCKET')
-    s3.upload_fileobj(
-        file,
-        bucket_name,
-        file.filename,
-        ExtraArgs={
-            "ACL":"public-read",
-            "ContentType":file.content_type
-        }
-    )
+    if "upload_image" not in request.flies:
+        flash("No Image selected", "warning")
+        return redirect(url_for('users.upload_image', username=current_user.name))
+    else:
+        file = request.files.get('upload_image')
+        bucket_name = os.getenv('S3_BUCKET')
+        s3.upload_fileobj(
+            file,
+            bucket_name,
+            file.filename,
+            ExtraArgs={
+                "ACL":"public-read",
+                "ContentType":file.content_type
+            }
+        )
 
-    image = Image(caption=request.form.get('caption'), url=f'https://kevinchan950-nextagram-flask.s3-ap-southeast-1.amazonaws.com/{file.filename}', user = current_user.id)
-    image.save()
-
-    return redirect(url_for('users.show', username=current_user.name))    
+        image = Image(caption=request.form.get('caption'), url=f'https://kevinchan950-nextagram-flask.s3-ap-southeast-1.amazonaws.com/{file.filename}', user = current_user.id)
+        if image.save():
+            flash("Image upload successfully", "success")
+            return redirect(url_for('users.show', username=current_user.name))
+        else: 
+            flash("Upload failed, please try again")
+            return render_template('users/upload_image.html')    
 
 
 # @users_blueprint.route('/', methods=["GET"])

@@ -1,0 +1,18 @@
+{% extends "_layout.html" %}
+
+{% block title %}
+    Edit About Me 
+{% endblock %}
+
+{% block content %}
+    <div class="py-5 px-5">
+        <h1>Edit About Me Info</h1>
+        <form action="{{ url_for('users.update_description',username=current_user.name) }}" method="POST">
+            <div class="form-group">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <input class="form-control mt-3" type="text" name="new_description" />
+                <button type="submit" class="btn btn-primary mt-3">Edit Description</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
