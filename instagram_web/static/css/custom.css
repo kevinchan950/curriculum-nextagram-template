@@ -1,8 +1,10 @@
 body {
+  font-family: 'Kiwi Maru', serif;
   margin: 0;
   padding-bottom: 15px;
   position: relative;
   min-height: 100vh;
+  background-color: rgba(194, 191, 191, 0.2);
 }
 
 footer {
@@ -20,7 +22,29 @@ footer a {
   color: #303030;
 }
 
+.profile_picture {
+  width: 100%;
+  border-radius: 50%;
+  border: 6px solid lightcoral;
+}
 
-.body_content {
-  padding: 20px;
+.image {
+  width: 100%;
+}
+
+.home_user {
+  background-color: lavender;
+  padding: 0 !important;
+}
+
+.home_image {
+  width: 100%;
+}
+
+.font-20 {
+  font-size: 20px;
+}
+
+.custom-shadow {
+  text-shadow: 3px 4px 7px rgba(255,255,255,0.9);
 }

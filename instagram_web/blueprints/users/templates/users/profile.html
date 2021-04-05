@@ -1,11 +1,38 @@
 {% extends "_layout.html" %}
 
 {% block title %}
-    {{ current_user.name }}
+    {{ user.name }}
 {% endblock %}
 
 {% block content %}
-    <h1>{{ current_user.name }}</h1>
+    <div class="px-3 pt-3">
+        <div class="container d-flex justify-content-center">
+            <img class="profile_picture" src= '{{ user.profile_picture}}' />
+        </div>
+        <div class="container text-center mt-5">
+            <h1>{{ user.name }}</h1>  
+            <p>{{ user.description }}</p>
 
-    <p>{{ current_user.id }}</p>
+        {% if current_user.name ==user.name %}
+            <a href="{{ url_for('users.new_description', username=current_user.name) }}"><button class="btn btn-secondary">Edit About Me</button></a>
+            <a href="{{ url_for('users.upload_profile', username=current_user.name) }}"><button class="btn btn-secondary">Upload Profile Picture</button></a>
+            <a href="{{ url_for('users.upload_image', username=current_user.name) }}"><button class="btn btn-secondary">Upload Image</button></a>
+        {% endif %}
+        </div>
+
+        <div class="container-fluid mx-2 my-4">
+            <div class="row">
+                {% for image in image_all %}
+                <div class="col col-lg-6 my-3">
+                    <div class="card">
+                        <img class="image" src = '{{ image.url }}' />
+                        <div class="card-body">
+                            <h5 class="card-title">{{ image.caption }}</h5>
+                        </div>
+                    </div>    
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 {% endblock %}
