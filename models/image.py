@@ -9,5 +9,4 @@ class Image(BaseModel):
     url = pw.TextField()
     user = pw.ForeignKeyField(User, backref='images', on_delete="CASCADE")
 
-
 # on_delete = "CASCADE" means when user is deleted, all the images will be deleted as well

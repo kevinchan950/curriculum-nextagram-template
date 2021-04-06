@@ -1,0 +1,44 @@
+{% extends "_layout.html" %}
+
+{% block title %}
+    Payment
+{% endblock %}
+
+{% block header %}
+    <script src="https://js.braintreegateway.com/web/dropin/1.27.0/js/dropin.min.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="py-5 px-5">
+        <h1 class="mb-5">Payment</h1>
+        <form action= "{{ url_for('payments.accept_payment', username = current_user.name, imageid = image.id) }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <label for="donation">Donation: ($)</label>
+            <input type="number" name="donation" step=".01" />
+            <div id="payment"></div>
+            <button type="submit">Donate</button>
+            <input type="hidden" name="nonce" id="nonce_field" />
+        </form>
+    </div>
+
+    <script type="text/javascript">
+        braintree.dropin.create({
+            container: document.querySelector("#payment"),
+            authorization: "{{ client_token }}"
+        }, (error, dropinInstance) => {
+            if (error){
+             console.error(error)
+            }    
+            document.querySelector("form").onsubmit = (e) => {
+                e.preventDefault()
+                dropinInstance.requestPaymentMethod((error, payload) => {
+                    if (error){
+                        console.error(error)
+                    }  
+                    document.querySelector("#nonce_field").value = payload.nonce
+                    document.querySelector("form").submit()
+                })
+            }
+        })
+    </script>
+{% endblock %}

@@ -25,7 +25,7 @@
                 {% for image in image_all %}
                 <div class="col col-lg-6 my-3">
                     <div class="card">
-                        <img class="image" src = '{{ image.url }}' />
+                        <a href="{{ url_for('users.show_image', username=image.user.name, image_id = image.id) }}"><img class="image" src = '{{ image.url }}' /></a>
                         <div class="card-body">
                             <h5 class="card-title">{{ image.caption }}</h5>
                         </div>

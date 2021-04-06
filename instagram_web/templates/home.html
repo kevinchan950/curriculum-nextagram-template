@@ -23,7 +23,7 @@
           {% for image in user.images %}
             <div class="col col-4">
               <div class="card mt-2 mb-2">
-                <img class="home_image" src= '{{ image.url }}' />
+                <a href="{{ url_for('users.show_image', username=image.user.name, image_id = image.id) }}"><img class="home_image" src= '{{ image.url }}' /></a>
               </div>
             </div>
           {% endfor %}

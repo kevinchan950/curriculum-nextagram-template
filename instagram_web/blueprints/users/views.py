@@ -1,3 +1,4 @@
+from operator import methodcaller
 from flask import Blueprint, render_template, redirect, request, session
 from flask.helpers import flash, url_for
 from flask.wrappers import Request
@@ -5,6 +6,7 @@ from peewee import Update
 from models.base_model import db
 from models.user import User
 from models.image import Image
+from models.donation import Donation
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import login_user, current_user, logout_user
 import boto3
@@ -122,6 +124,15 @@ def create_image(username):
             flash("Upload failed, please try again")
             return render_template('users/upload_image.html')    
 
+
+@users_blueprint.route('/<username>/<image_id>', methods=["GET"])
+def show_image(username,image_id):
+    image = Image.get_by_id(image_id)
+    donations = Donation.select().join(Image).where(Image.id == image_id)
+    total_donation = 0 
+    for donation in donations:
+        total_donation += donation.amount
+    return render_template('users/image.html', image=image, donations = donations, total_donation=total_donation)
 
 # @users_blueprint.route('/', methods=["GET"])
 # def index():
