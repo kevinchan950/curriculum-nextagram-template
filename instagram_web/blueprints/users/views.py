@@ -7,11 +7,14 @@ from models.base_model import db
 from models.user import User
 from models.image import Image
 from models.donation import Donation
+from models.request import Requested
+from models.follow import Follow
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import login_user, current_user, logout_user
 import boto3
 import os
 import peewee as pw
+import datetime
 
 users_blueprint = Blueprint('users',
                             __name__,
@@ -46,15 +49,37 @@ def create():
         return render_template('users/new.html', errors=user.errors)
 
 
-@users_blueprint.route('/<username>', methods=["GET"])
+@users_blueprint.route('/<username>')
 def show(username):
     user = User.get(name=username)
     if user.description =="None":
         user.description = "No Info"
 
     image_all = Image.select().where(Image.user_id==user.id)
+    
+    requested = Requested.select().join(User, on=(User.id==Requested.fan_id)).where(Requested.idol_id == user.id)
 
-    return render_template("users/profile.html", user=user, image_all=image_all)
+    followers = Follow.select().join(User, on=(User.id==Follow.fan_id)).where(Follow.idol_id == user.id)
+    
+    if not current_user.is_authenticated:
+        return render_template("users/profile.html", user=user, image_all=image_all, requested=requested, followers=followers)
+    
+    if user.name != current_user.name:    
+        is_requested = Requested.get_or_none(fan_id=current_user.id, idol_id=user.id)
+        is_follower = Follow.get_or_none(fan_id=current_user.id, idol_id=user.id)
+        return render_template("users/profile.html", user=user, image_all=image_all, is_requested=is_requested, is_follower=is_follower, followers=followers)
+    else:
+        return render_template("users/profile.html", user=user, image_all=image_all, requested=requested, followers=followers)
+
+
+@users_blueprint.route('/<username>/newsfeed')
+def newsfeed(username):
+    weeks_ago = datetime.date.today() - datetime.timedelta(days=7)
+    images = Image.select().where(Image.created_at >= weeks_ago)
+    users = User.select().join(Follow, on=(Follow.idol_id == User.id)).where(Follow.fan_id == current_user.id)
+    user_with_images = pw.prefetch(users,images)
+    print("Hello")
+    return render_template('users/newsfeed.html', user_with_images=user_with_images)
 
 
 @users_blueprint.route('/<username>/upload/profile', methods=["GET"])
@@ -88,8 +113,17 @@ def new_description(username):
 
 @users_blueprint.route('/<username>/update/description', methods=["POST"])
 def update_description(username):
-    update = User.update(description=request.form.get('new_description')).where(User.name==current_user.name)
-    update.execute()
+    if request.form.get('new_description').strip("") == "":
+        pass
+    else:
+        update = User.update(description=request.form.get('new_description')).where(User.name==current_user.name)
+        update.execute()
+    if request.form.get('privacy')== None:
+        update2 = User.update(is_private=False).where(User.name==current_user.name)
+        update2.execute()
+    else:
+        update2 = User.update(is_private=True).where(User.id==current_user.id)
+        update2.execute()
     return redirect(url_for('users.show', username=current_user.name))
 
 
@@ -128,7 +162,7 @@ def create_image(username):
 @users_blueprint.route('/<username>/<image_id>', methods=["GET"])
 def show_image(username,image_id):
     image = Image.get_by_id(image_id)
-    donations = Donation.select().join(Image).where(Image.id == image_id)
+    donations = Donation.select().join(Image).join(User).where(Image.id == image_id)
     total_donation = 0 
     for donation in donations:
         total_donation += donation.amount

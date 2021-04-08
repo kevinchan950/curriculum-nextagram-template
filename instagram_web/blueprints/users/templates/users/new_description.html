@@ -6,12 +6,21 @@
 
 {% block content %}
     <div class="py-5 px-5">
-        <h1>Edit About Me Info</h1>
+        <h1>Edit Profile</h1>
         <form action="{{ url_for('users.update_description',username=current_user.name) }}" method="POST">
             <div class="form-group">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                <input class="form-control mt-3" type="text" name="new_description" />
-                <button type="submit" class="btn btn-primary mt-3">Edit Description</button>
+                <input class="form-control mt-3" type="text" name="new_description" placeholder="Type None to display nothing"/>
+                <button type="submit" class="btn btn-primary mt-3">Edit Profile</button>
+                
+                <div class="mt-2">
+                    <label for="privacy">Private:</label>
+                    {% if current_user.is_private == true %}
+                        <input type="checkbox" name="privacy" checked />
+                    {% else %}
+                        <input type="checkbox" name="privacy" />
+                    {% endif %}
+                </div>
             </div>
         </form>
     </div>

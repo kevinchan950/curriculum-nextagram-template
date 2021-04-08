@@ -18,7 +18,8 @@
                 <label for="password">Password:</label>
                 <input type="password" class="form-control" name="password" />
             </div>
-    
+            
+            <p class="text-muted"><span class="text-dark font-weight-bold">OR</span> log in via <a class="text-dark font-weight-bold font-italic" href="{{ url_for('sessions.google_login') }}">Google</a></p>
             <small class="text-muted font-italic">Haven't Sign Up?<a href="{{ url_for('users.new') }}" class="text-decoration-none text-dark "><strong> Sign Up Now! </strong></a></small>
     
             <div class="mt-2">

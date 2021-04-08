@@ -12,14 +12,60 @@
         <div class="container text-center mt-5">
             <h1>{{ user.name }}</h1>  
             <p>{{ user.description }}</p>
-
+            <div class="top-right">
+                Followers: {{ followers.count() }}
+            </div>
         {% if current_user.name ==user.name %}
-            <a href="{{ url_for('users.new_description', username=current_user.name) }}"><button class="btn btn-secondary">Edit About Me</button></a>
+            <a href="{{ url_for('users.new_description', username=current_user.name) }}"><button class="btn btn-secondary">Edit Profile</button></a>
             <a href="{{ url_for('users.upload_profile', username=current_user.name) }}"><button class="btn btn-secondary">Upload Profile Picture</button></a>
             <a href="{{ url_for('users.upload_image', username=current_user.name) }}"><button class="btn btn-secondary">Upload Image</button></a>
+            <div class="dropdown top-left">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Follow Request</button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    {% if requested %}
+                    {% for request in requested %}
+                        <li class="px-3" style="width: 400px;">
+                            <div class="mb-1 mt-1 d-flex justify-content-between">
+                                {{ request.fan.name }}
+                                <span class="d-flex">
+                                    <form action="{{ url_for('follows.create_follow', fans_id =request.fan_id) }}" methods="POST">
+                                        <button class="btn btn-sm btn-outline-success mr-1" type="submit">Accept</button>
+                                    </form>
+                                    <form action="{{ url_for('requests.delete_request', fans_id=request.fan_id) }}" methods="POST">
+                                        <button class="btn btn-sm btn-outline-danger" type="submit">Decline</button>  
+                                    </form>
+                                </span>
+                            </div>
+                            <hr>
+                        </li>
+                    {% endfor %}
+                    {% else %}
+                        <div class="px-3 text-center" style="width: 400px;">No follow request</div>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            {% if is_follower %}
+                <form action=" {{ url_for('follows.delete_follow', idols_id=user.id) }}" methods="POST">
+                    <button class="btn btn-danger" type="submit">Unfollow</button>   
+                </form>
+            {% endif %}
+            
+            {% if is_requested %}
+                    <button class="btn btn-sm">Awaiting for Approve</button>                    
+            {% endif %}
+            
+            {% if not is_follower and not is_requested %}
+            <form action="{{ url_for('requests.create_request', idols_id = user.id) }}" methods="POST">
+                <button class="btn btn-info" type="submit">Follow</button>
+            </form>
+            {% endif %}
         {% endif %}
         </div>
 
+        {% if not current_user.is_authenticated %}
+            <h4 class="text-center mt-5">Login to see more info!</h4>
+        {% elif user.is_private == false or current_user.name == user.name or is_follower %}
         <div class="container-fluid mx-2 my-4">
             <div class="row">
                 {% for image in image_all %}
@@ -34,5 +80,8 @@
                 {% endfor %}
             </div>
         </div>
+        {% else %}
+            <h4 class="text-center mt-5">Private user. Follow the user now !</h4>
+        {% endif %}
     </div>
 {% endblock %}

@@ -13,6 +13,7 @@ class User(UserMixin,BaseModel):
     password = None
     profile_picture = pw.CharField(default='https://i.stack.imgur.com/l60Hf.png')
     description = pw.CharField(default="None")
+    is_private = pw.BooleanField(default=False, null=True)
 
     def validate(self):
         duplicate_email = User.get_or_none(User.email == self.email)

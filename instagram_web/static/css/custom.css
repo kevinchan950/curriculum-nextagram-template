@@ -48,3 +48,24 @@ footer a {
 .custom-shadow {
   text-shadow: 3px 4px 7px rgba(255,255,255,0.9);
 }
+
+.top-left {
+  position: absolute;
+  left: 5px;
+  top: 70px;
+}
+
+.top-right {
+  font-size: 1.3rem;
+  position: absolute;
+  right: 5px;
+  top: 70px;
+}
+
+.flash_message {
+  text-align: center;
+}
+
+.font-40 {
+  font-size:40px
+}
