@@ -78,7 +78,6 @@ def newsfeed(username):
     images = Image.select().where(Image.created_at >= weeks_ago)
     users = User.select().join(Follow, on=(Follow.idol_id == User.id)).where(Follow.fan_id == current_user.id)
     user_with_images = pw.prefetch(users,images)
-    print("Hello")
     return render_template('users/newsfeed.html', user_with_images=user_with_images)
 
 
